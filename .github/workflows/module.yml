@@ -1,29 +1,101 @@
-name: Release Magisk Module
+name: TikTok Blocklist Module
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allow manual triggering
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
 
 jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    outputs:
+      updated: ${{ steps.update_check.outputs.updated }}
+      module_version: ${{ steps.update_check.outputs.module_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up environment
+        run: |
+          echo "DATE=$(date +%Y.%m.%d)" >> $GITHUB_ENV
+          echo "TODAY=$(date +%Y%m%d)" >> $GITHUB_ENV
+          echo "YEAR_MONTH_DAY=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+          
+      - name: Fetch mainline blocklist
+        run: |
+          curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.tiktok.extended.txt > mainline_hosts.txt
+          
+      - name: Extract mainline version
+        id: mainline
+        run: |
+          MAINLINE_VERSION=$(grep -o "# Version: .*" mainline_hosts.txt | sed 's/# Version: //')
+          MAINLINE_DATE=$(echo $MAINLINE_VERSION | cut -d'.' -f1-2 | sed 's/\.0\?/./g')
+          echo "Found mainline version: $MAINLINE_VERSION (date: $MAINLINE_DATE)"
+          echo "MAINLINE_VERSION=$MAINLINE_VERSION" >> $GITHUB_ENV
+          echo "MAINLINE_DATE=$MAINLINE_DATE" >> $GITHUB_ENV
+          
+      - name: Extract current version
+        id: current
+        run: |
+          CURRENT_VERSION=$(grep "version=" module/module.prop | cut -d'=' -f2 | sed 's/^v//')
+          echo "Current module version: $CURRENT_VERSION"
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          
+      - name: Compare versions and update if needed
+        id: update_check
+        run: |
+          if [ "$MAINLINE_DATE" != "$CURRENT_VERSION" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "New version detected or manual update requested. Updating files..."
+            
+            # Update hosts file
+            cp mainline_hosts.txt module/system/etc/hosts
+            
+            # Update version in module.prop
+            VERSION_CODE=$(echo $YEAR_MONTH_DAY | sed 's/\.//g')
+            sed -i "s/version=.*/version=v$YEAR_MONTH_DAY/" module/module.prop
+            sed -i "s/versionCode=.*/versionCode=$VERSION_CODE/" module/module.prop
+            
+            # Update version in update.json
+            sed -i "s/\"version\": \".*\"/\"version\": \"v$YEAR_MONTH_DAY\"/" update.json
+            sed -i "s/\"versionCode\": [0-9]*/\"versionCode\": $VERSION_CODE/" update.json
+           
+            # Configure Git
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            
+            # Commit changes
+            git add module/system/etc/hosts module/module.prop update.json
+            git commit -m "Update to version $MAINLINE_VERSION"
+            git push
+            
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "module_version=v$YEAR_MONTH_DAY" >> $GITHUB_OUTPUT
+            echo "Updated successfully to version $YEAR_MONTH_DAY"
+          else
+            echo "No updates needed. Current version is already up to date."
+            echo "updated=false" >> $GITHUB_OUTPUT
+            
+            # Still pass the current version even if no update needed
+            CURRENT_VERSION_WITH_V="v$CURRENT_VERSION"
+            echo "module_version=$CURRENT_VERSION_WITH_V" >> $GITHUB_OUTPUT
+          fi
+
   build:
+    needs: check-and-update
+    if: ${{ needs.check-and-update.outputs.updated == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
-
+      
     - name: Install Zip Tool
       run: sudo apt-get install -y zip
-
-    - name: Read Version from module.prop
-      id: read_version
-      run: |
-        VERSION=$(grep '^version=' module/module.prop | cut -d'=' -f2)
-        echo "module_version=$VERSION" >> $GITHUB_ENV
 
     - name: Create Magisk Module ZIP
       run: |
         mkdir -p release
-        cd module # Path to the module directory in your repository
+        cd module
         zip -r9 --compression-method store "../release/install.zip" .
 
     - name: Commit and Push install.zip to Repository
@@ -32,13 +104,13 @@ jobs:
         git config user.email "actions@github.com"
         cp release/install.zip .
         git add install.zip
-        git commit -m "Release module ${{ env.module_version }}"
+        git commit -m "Release module ${{ needs.check-and-update.outputs.module_version }}"
         git push origin main
 
     - name: Create Tag and Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git tag ${{ env.module_version }}
-        git push origin ${{ env.module_version }}
-        gh release create ${{ env.module_version }} install.zip --title "${{ env.module_version }}" --notes "Automatically created release."
+        git tag ${{ needs.check-and-update.outputs.module_version }}
+        git push origin ${{ needs.check-and-update.outputs.module_version }}
+        gh release create ${{ needs.check-and-update.outputs.module_version }} install.zip --title "${{ needs.check-and-update.outputs.module_version }}" --notes "Automatically created release."
