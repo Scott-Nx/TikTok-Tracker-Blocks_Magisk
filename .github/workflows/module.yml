@@ -102,6 +102,7 @@ jobs:
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
+        git pull
         cp release/install.zip .
         git add install.zip
         git commit -m "Release module ${{ needs.check-and-update.outputs.module_version }}"
