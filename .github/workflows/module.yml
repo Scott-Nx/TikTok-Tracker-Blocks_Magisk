@@ -73,16 +73,16 @@ jobs:
             echo "Updated successfully to version $YEAR_MONTH_DAY"
           else
             echo "No updates needed. Current version is already up to date."
+            # Set outputs but don't modify any files or make commits
             echo "updated=false" >> $GITHUB_OUTPUT
-            
-            # Still pass the current version even if no update needed
             CURRENT_VERSION_WITH_V="v$CURRENT_VERSION"
             echo "module_version=$CURRENT_VERSION_WITH_V" >> $GITHUB_OUTPUT
+            echo "Exiting without making any changes"
           fi
 
   build:
     needs: check-and-update
-    if: ${{ needs.check-and-update.outputs.updated == 'true' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.check-and-update.outputs.updated == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
