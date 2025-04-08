@@ -4,10 +4,10 @@
 # License: https://github.com/hagezi/dns-blocklists/blob/main/LICENSE
 # Issues: https://github.com/hagezi/dns-blocklists/issues
 # Expires: 1 day
-# Last modified: 15 Mar 2025 01:15 UTC
-# Version: 2025.0315.0115.00
+# Last modified: 01 Apr 2025 23:26 UTC
+# Version: 2025.0401.2326.48
 # Syntax: Hosts (including possible subdomains)
-# Number of entries: 365
+# Number of entries: 363
 #
 0.0.0.0 frontier.byteoversea.com
 0.0.0.0 gplog-sg.byteoversea.com
@@ -87,7 +87,6 @@
 0.0.0.0 url2696.ads.tiktok.com
 0.0.0.0 ads-api.tiktok.com
 0.0.0.0 ads-frontier.tiktok.com
-0.0.0.0 ads-service.tiktok.com
 0.0.0.0 ads-sg.tiktok.com
 0.0.0.0 analytics.tiktok.com
 0.0.0.0 analytics-attribution.tiktok.com
@@ -117,7 +116,6 @@
 0.0.0.0 mcs.us.tiktok.com
 0.0.0.0 mcs-ttp2.us.tiktok.com
 0.0.0.0 mssdk.us.tiktok.com
-0.0.0.0 mssdk-ttp2.us.tiktok.com
 0.0.0.0 sf16-telemetry-proxy-oci.tiktokcdn-us.com
 0.0.0.0 ad.tiktokv.com
 0.0.0.0 ad.tiktokv.us
@@ -365,6 +363,7 @@
 0.0.0.0 ads-ie.tiktokw.eu
 0.0.0.0 ads-ttp2.tiktokw.eu
 0.0.0.0 analytics-ie.tiktokw.eu
+0.0.0.0 analytics-ipv6.tiktokw.us
 0.0.0.0 analytics-ttp2.tiktokw.eu
 0.0.0.0 location.tiktokw.us
 0.0.0.0 mcs.tiktokw.us
@@ -373,4 +372,3 @@
 0.0.0.0 mcs16-normal-no1a.tiktokw.eu
 0.0.0.0 mssdk.tiktokw.eu
 0.0.0.0 mssdk.tiktokw.us
-0.0.0.0 mssdk-ttp2.tiktokw.us
