@@ -40,3 +40,15 @@ This module is provided as-is with no warranties. While it aims to block trackin
 ## Updates
 
 The blocklist is regularly updated to include the latest known tracking domains. To receive updates, check back periodically or watch this repository.
+
+## License
+
+This project is licensed under the **MIT License**.  
+See [`LICENSE`](./LICENSE) for details.
+
+### Third-Party License Notice
+
+This repository includes a `hosts` file which is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+
+See [`COPYING.GPLv3`](./COPYING.GPLv3) for the full license text of the `hosts` file.  
+The original source of the hosts file can be found at: [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists)
