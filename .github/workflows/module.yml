@@ -2,10 +2,19 @@ name: Release Magisk Module
 
 on:
   workflow_dispatch:
+    inputs:
+      bump_version:
+        description: 'Update the version number in module.prop'
+        required: false
+        type: boolean
+        default: false
+      custom_notes:
+        description: 'Custom release notes'
+        required: false
+        type: string
 
 permissions:
-  contents: read
-  actions: write
+  contents: write # Required for creating releases, commits, tags, and pushes
 
 jobs:
   build:
@@ -14,31 +23,47 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Fetch all history for tag creation and versioning
 
-    - name: Install Zip Tool
-      run: sudo apt-get install -y zip
+    - name: Setup Build Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zip jq
 
     - name: Read Version from module.prop
       id: read_version
       run: |
         VERSION=$(grep '^version=' module/module.prop | cut -d'=' -f2)
-        echo "::set-output name=module_version::$VERSION"
+        echo "module_version=${VERSION}" >> $GITHUB_OUTPUT
 
     - name: Create Magisk Module ZIP
+      id: create_zip
       run: |
         mkdir -p release
         cd module # Path to the module directory in your repository
         zip -r9 --compression-method store "../release/install.zip" .
+        echo "zip_path=$(realpath ../release/install.zip)" >> $GITHUB_OUTPUT
+        echo "zip_size=$(du -h ../release/install.zip | cut -f1)" >> $GITHUB_OUTPUT
+
+    - name: Verify ZIP Content
+      run: |
+        echo "📦 ZIP created successfully: ${{ steps.create_zip.outputs.zip_path }} (${{ steps.create_zip.outputs.zip_size }})"
+        unzip -l release/install.zip | head -n 20
+
+    - name: Copy ZIP to Repository Root
+      run: cp release/install.zip .
+
+    - name: Update Version in update.json
+      run: |
+        jq --arg version "${{ steps.read_version.outputs.module_version }}" \
+           '.version = $version' update.json > update.json.tmp && mv update.json.tmp update.json
 
     - name: Commit and Push install.zip to Repository
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        cp release/install.zip .
-        git add install.zip
+        git add install.zip update.json
         git commit -m "Release module ${{ steps.read_version.outputs.module_version }}"
         git push origin main
 
@@ -46,6 +71,21 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        # Set release notes
+        if [[ "${{ github.event.inputs.custom_notes }}" != "" ]]; then
+          RELEASE_NOTES="${{ github.event.inputs.custom_notes }}"
+        else
+          RELEASE_NOTES="Magisk module release ${{ steps.read_version.outputs.module_version }}"
+        fi
+        
+        # Create and push tag
         git tag ${{ steps.read_version.outputs.module_version }}
         git push origin ${{ steps.read_version.outputs.module_version }}
-        gh release create ${{ steps.read_version.outputs.module_version }} install.zip --title "${{ steps.read_version.outputs.module_version }}" --notes "Automatically created release."
+        
+        # Create GitHub release
+        gh release create ${{ steps.read_version.outputs.module_version }} \
+          install.zip \
+          --title "Release ${{ steps.read_version.outputs.module_version }}" \
+          --notes "${RELEASE_NOTES}"
+        
+        echo "✅ Release created successfully: ${{ steps.read_version.outputs.module_version }}"
