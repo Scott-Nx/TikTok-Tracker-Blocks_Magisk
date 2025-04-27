@@ -3,6 +3,10 @@ name: Release Magisk Module
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
       id: read_version
       run: |
         VERSION=$(grep '^version=' module/module.prop | cut -d'=' -f2)
-        echo "module_version=$VERSION" >> $GITHUB_ENV
+        echo "::set-output name=module_version::$VERSION"
 
     - name: Create Magisk Module ZIP
       run: |
@@ -32,13 +36,13 @@ jobs:
         git config user.email "actions@github.com"
         cp release/install.zip .
         git add install.zip
-        git commit -m "Release module ${{ env.module_version }}"
+        git commit -m "Release module ${{ steps.read_version.outputs.module_version }}"
         git push origin main
 
     - name: Create Tag and Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git tag ${{ env.module_version }}
-        git push origin ${{ env.module_version }}
-        gh release create ${{ env.module_version }} install.zip --title "${{ env.module_version }}" --notes "Automatically created release."
+        git tag ${{ steps.read_version.outputs.module_version }}
+        git push origin ${{ steps.read_version.outputs.module_version }}
+        gh release create ${{ steps.read_version.outputs.module_version }} install.zip --title "${{ steps.read_version.outputs.module_version }}" --notes "Automatically created release."
