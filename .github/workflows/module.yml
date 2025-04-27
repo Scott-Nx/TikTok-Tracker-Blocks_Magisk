@@ -31,9 +31,12 @@ jobs:
         zip -r9 --compression-method store "../release/install.zip" .
 
     - name: Commit and Push install.zip to Repository
+      env:
+        ACTIONS_PAT: ${{ secrets.ACTIONS_PAT }}
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
+        git remote set-url origin https://x-access-token:${{ secrets.ACTIONS_PAT }}@github.com/${{ github.repository }}.git
         cp release/install.zip .
         git add install.zip
         git commit -m "Release module ${{ steps.read_version.outputs.module_version }}"
