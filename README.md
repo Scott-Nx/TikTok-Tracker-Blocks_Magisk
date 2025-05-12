@@ -48,7 +48,7 @@ See [`LICENSE`](./LICENSE) for details.
 
 ### Third-Party License Notice
 
-This repository includes a `hosts` file which is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+This repository includes a `hosts` file and used [host-compression-scripts](https://github.com/Lateralus138/hosts-compression-scripts) which is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
-See [`COPYING.GPLv3`](./COPYING.GPLv3) for the full license text of the `hosts` file.  
+See [`COPYING.GPLv3`](./COPYING.GPLv3) for the full license text.  
 The original source of the hosts file can be found at: [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists)
