@@ -1,0 +1,32 @@
+name: Compress Hosts File
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  compress_hosts:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4.2.2
+      - name: Download compression script
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/Lateralus138/hosts-compression-scripts/releases/download/1.0.1693086432/compress_hosts.ps1" -OutFile "compress_hosts.ps1"
+
+      - name: Compress hosts file
+        shell: pwsh
+        run: |
+          ./compress_hosts.ps1 -InputFile ".\module\system\etc\hosts" -OutputFile ".\module\system\etc\hosts.compressed"
+          Move-Item -Path ".\module\system\etc\hosts.compressed" -Destination ".\module\system\etc\hosts" -Force
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add module/system/etc/hosts
+          git commit -m "Compress hosts file"
+          git push origin main
