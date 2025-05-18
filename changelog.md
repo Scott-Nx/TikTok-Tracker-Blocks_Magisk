@@ -1,9 +1,5 @@
-# Version 2025.05.09-r2
+# Version 2025.05.17-r1
 
-## Block lists
+## hosts
 
-- Used compression to reduce the size of the block lists.
-
-## module.prop
-
-- Added a revision version to the module.prop file to track changes in the module.
+- Update to lastest version of `hosts` file from [HaGeZi's TikTok Extended Fingerprinting DNS Blocklist](https://github.com/hagezi/dns-blocklists)
