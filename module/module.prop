@@ -1,7 +1,7 @@
 id=TikTokTB
 name=TikTok Trackers Blocker
-version=v2025.06.12-r1
-versionCode=202506121
+version=v2025.06.20-r1
+versionCode=202506201
 author=scxtt-nc, hagezi
 description=Block TikTok Trackers
 updateJson=https://raw.githubusercontent.com/scxtt-nc/TikTok-Tracker-Blocks_Magisk/main/update.json
