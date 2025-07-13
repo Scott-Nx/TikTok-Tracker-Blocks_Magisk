@@ -31,7 +31,7 @@ The module modifies the system's hosts file to redirect tracking domain requests
 ## Credits
 
 - Host list maintained by [hagezi](https://github.com/hagezi/dns-blocklists)
-- Module maintained by [scxtt-nc](https://github.com/scxtt-nc)
+- Module maintained by [Scott-Nx](https://github.com/Scott-Nx)
 
 ## Disclaimer
 
