@@ -1,4 +1,4 @@
-# TikTok Tracker Blocks Magisk Module
+# TikTok Tracker Blocks — Magisk Module
 
 A simple Magisk module to block TikTok tracking domains on Android devices.
 
@@ -8,7 +8,7 @@ This module adds entries to your device's hosts file to block numerous TikTok tr
 
 ## Features
 
-- Blocks 300+ TikTok tracking and fingerprinting domains
+- Blocks hundreds of TikTok tracking and fingerprinting domains
 - Simple installation via Magisk Manager
 
 ## Requirements
@@ -18,7 +18,7 @@ This module adds entries to your device's hosts file to block numerous TikTok tr
 
 ## Installation
 
-1. Download the latest module ZIP from the [Releases](https://github.com/scxtt-nc/TikTok-Tracker-Blocks_Magisk/releases) page
+1. Download the latest module ZIP from the [Releases](https://github.com/Scott-Nx/TikTok-Tracker-Blocks_Magisk/releases) page
 2. Open Magisk Manager
 3. Tap on Modules > Install from storage
 4. Select the downloaded ZIP file
@@ -26,7 +26,7 @@ This module adds entries to your device's hosts file to block numerous TikTok tr
 
 ## How It Works
 
-The module modifies the system's hosts file to redirect tracking domain requests to `0.0.0.0`, effectively blocking the connection. This prevents TikTok from sending your usage data to their tracking servers.
+The module overlays the system hosts file to redirect tracking domain requests to `0.0.0.0`, effectively blocking the connection. This prevents TikTok from sending your usage data to their tracking servers.
 
 ## Credits
 
@@ -48,7 +48,11 @@ See [`LICENSE`](./LICENSE) for details.
 
 ### Third-Party License Notice
 
-This repository includes a `hosts` file and used [host-compression-scripts](https://github.com/Lateralus138/hosts-compression-scripts) which is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+This repository includes a `hosts` file and previously used [host-compression-scripts](https://github.com/Lateralus138/hosts-compression-scripts) which is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
 See [`COPYING.GPLv3`](./COPYING.GPLv3) for the full license text.  
 The original source of the hosts file can be found at: [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists)
+
+## Maintainers
+
+- See `.github/copilot-instructions.md` for the maintenance workflow, versioning scheme, and release packaging conventions used by this project.
