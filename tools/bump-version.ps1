@@ -13,8 +13,16 @@ $updateJson = Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath "..\update.
 if ($Version -notmatch '^v\d{4}\.\d{2}\.\d{2}-r\d+$') {
     throw "Version must match vYYYY.MM.DD-rN"
 }
-if ($VersionCode -notmatch '^[0-9]{9,}$') {
-    throw "VersionCode must be numeric, like YYYYMMDDRNN"
+if ($VersionCode -notmatch '^\d{8}\d{1,3}$') {
+    throw "VersionCode must match format YYYYMMDDRNN (8-digit date + 1-3 digit revision, e.g., v2024.06.01-r1 -> 202406011)"
+}
+
+# Cross-check: ensure VersionCode matches Version (YYYYMMDD + revision)
+if ($Version -match '^v(?<Y>\d{4})\.(?<M>\d{2})\.(?<D>\d{2})-r(?<R>\d+)$') {
+    $expectedCode = "$($Matches.Y)$($Matches.M)$($Matches.D)$($Matches.R)"
+    if ($VersionCode.ToString() -ne $expectedCode) {
+        throw "VersionCode ($VersionCode) must match Version ($Version). Expected $expectedCode"
+    }
 }
 
 # Update module.prop
