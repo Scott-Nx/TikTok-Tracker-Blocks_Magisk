@@ -1,5 +1,5 @@
-# Version 2025.08.01-r1
+# v2025.08.01-r1
 
 ## hosts
 
-- Update to lastest version of `hosts` file from [HaGeZi's TikTok Extended Fingerprinting DNS Blocklist](https://github.com/hagezi/dns-blocklists)
+- Update to latest version of `hosts` file from [HaGeZi's TikTok Extended Fingerprinting DNS Blocklist](https://github.com/hagezi/dns-blocklists)
