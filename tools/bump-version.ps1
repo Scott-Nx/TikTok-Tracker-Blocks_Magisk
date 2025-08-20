@@ -35,6 +35,7 @@ Set-Content -NoNewline -Path $moduleProp -Value $prop
 $json = Get-Content $updateJson | ConvertFrom-Json
 $json.version = $Version
 $json.versionCode = [int64]$VersionCode
-$json | ConvertTo-Json -Depth 5 | Set-Content -NoNewline $updateJson
+# Use a small, explicit depth since update.json is flat
+$json | ConvertTo-Json -Depth 3 | Set-Content -NoNewline $updateJson
 
 Write-Host "Updated versions to $Version ($VersionCode) in module.prop and update.json"
